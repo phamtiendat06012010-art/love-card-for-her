@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Her With Love 💖</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/TextPlugin.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+
+    <style>
+        /* -------------------------------------------------------------------- */
+        /* CSS: Cấu trúc và Hiệu ứng */
+        /* -------------------------------------------------------------------- */
+        body {
+            background-color: #fce4ec; /* Hồng pastel nhẹ */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #444;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #ff69b4; /* Hồng đậm */
+            color: white;
+            font-weight: bold;
+            transition: transform 0.2s, background-color 0.2s;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background-color: #ff1493;
+            transform: scale(1.05);
+        }
+
+        .music-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+
+        /* Container chính của thiệp */
+        #loveCardContainer {
+            width: 350px;
+            height: 500px;
+            position: relative;
+            perspective: 1500px; /* Tạo hiệu ứng 3D */
+            /* Đảm bảo container này luôn hiển thị */
+            opacity: 1 !important; 
+        }
+
+        /* Các trang thiệp */
+        .card-page {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+            padding: 30px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            text-align: center;
+        }
+
+        .card-page h2 {
+            color: #8b0000;
+            margin-bottom: 20px;
+        }
+
+        .card-page.active-page {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+        
+        /* -------------------- Trang 1: Bìa Thiệp (3D Flip) -------------------- */
+        .cover-page {
+            background: none;
+            transform-style: preserve-3d;
+            cursor: pointer;
+            padding: 0;
+            box-shadow: none;
+        }
+
+        .cover-front, .cover-back {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .cover-front {
+            background-color: #ffc0cb; /* Hồng nhạt */
+            background-image: url('pastel_flower_bg.jpg'); /* Thay bằng ảnh thực tế */
+            background-size: cover;
+            background-position: center;
+            z-index: 2;
+            transform: rotateY(0deg);
+        }
+
+        .cover-back {
+            background-color: #fff0f5; /* Trắng ngà */
+            transform: rotateY(180deg);
+            z-index: 1;
+        }
+
+        .cover-front h1 {
+            color: #8b0000;
+            font-size: 2.5em;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
+        }
+        .cover-front p {
+            margin-top: 10px;
+            font-style: italic;
+            color: #4b0082;
+            font-size: 1.1em;
+        }
+
+        /* -------------------- Trang 2: Lời chúc cá nhân hoá -------------------- */
+        .message-content {
+            width: 100%;
+            margin-top: 50px;
+        }
+        #recipientName {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #ff69b4;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 1.1em;
+        }
+        .greeting-text {
+            min-height: 80px;
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #a0522d;
+            font-style: italic;
+        }
+
+        /* -------------------- Trang 3: Bộ sưu tập cảm xúc (Swiper) -------------------- */
+        .swiper-container {
+            width: 100%;
+            height: 300px;
+            margin-top: 20px;
+        }
+
+        .glassmorphism-card {
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            cursor: pointer;
+            height: 100%;
+        }
+
+        .glassmorphism-card img {
+            width: 80%;
+            max-height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        
+        /* -------------------- Trang 4: Quà tặng ảo -------------------- */
+        .gift-box {
+            width: 150px;
+            height: 100px;
+            position: relative;
+            transform-style: preserve-3d;
+            margin: 40px 0;
+        }
+
+        .base {
+            width: 100%;
+            height: 100%;
+            background-color: #d4a796;
+            border-radius: 5px;
+            position: absolute;
+            transform: translateZ(0);
+        }
+
+        .lid {
+            width: 100%;
+            height: 30px;
+            background-color: #ff69b4;
+            position: absolute;
+            top: -20px;
+            border-radius: 5px;
+            transform-origin: bottom center;
+            transform: rotateX(0deg);
+        }
+        
+        .virtual-gift {
+            margin-top: 20px;
+        }
+        .rotating-gift {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            /* Animation sẽ được thêm bằng GSAP */
+        }
+        
+        /* -------------------- Trang 5: Bức thư tình cảm -------------------- */
+        .letter-paper {
+            background-color: #fffaf0; /* Giấy thư */
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            min-height: 300px;
+            text-align: left;
+            margin-top: 15px;
+        }
+        
+        #handwritingText {
+            margin-top: 20px;
+        }
+        
+        .final-letter-content {
+            font-family: 'Dancing Script', cursive; /* Cần thêm font ngoài */
+            font-size: 1.2em;
+            color: #a0522d;
+            min-height: 100px;
+        }
+
+        /* Hiệu ứng "viết tay" */
+        #letterPath {
+            fill: none;
+            stroke: #a0522d;
+            stroke-width: 2;
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+        }
+        
+        /* -------------------- Trang 6: Chia sẻ -------------------- */
+        .share-box {
+            width: 100%;
+            margin-top: 30px;
+        }
+        .qr-code {
+            width: 100px;
+            height: 100px;
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+        }
+        #shareLink {
+            width: 90%;
+            padding: 8px;
+            border: 1px solid #ff69b4;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <button id="musicToggle" class="music-btn">🎵 Bật nhạc</button>
+    <audio id="backgroundMusic" loop src="your_romantic_music.mp3"></audio>
+
+    <div id="loveCardContainer">
+        
+        <div id="page1" class="card-page cover-page active-page">
+            <div class="cover-front">
+                <h1>LoveCard 20/10</h1>
+                <p>Chạm để mở điều bất ngờ dành cho bạn 💌</p>
+            </div>
+            <div class="cover-back"></div>
+        </div>
+
+        <div id="page2" class="card-page message-page">
+            <h2>Lời Chúc Tình Yêu</h2>
+            <div class="message-content">
+                <label for="recipientName">Nhập tên người nhận: <span class="heart-icon">💖</span></label>
+                <input type="text" id="recipientName" placeholder="Ví dụ: Mai Anh">
+                <button id="showGreetingBtn">Gửi ➡️</button>
+
+                <div id="greetingDisplay" class="hidden">
+                    <p class="greeting-text"></p>
+                    <button id="goToPage3">Tiếp tục ➡️</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="page3" class="card-page gallery-page">
+    <h2>Bộ sưu tập cảm xúc</h2>
+    <div class="swiper-container">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide glassmorphism-card" data-quote="Phụ nữ là bông hoa biết nở dù trong giông bão.">
+                <img src="https://hoaviet247.com/wp-content/uploads/2024/07/bo-hoa-tuoi-bh008-trai-tim.webp" alt="Hoa & Hương">
+                <h3>🌹 Hoa & Hương</h3>
+            </div>
+            <div class="swiper-slide glassmorphism-card" data-quote="Vẻ đẹp là khi bạn quyết định là chính mình.">
+                <img src="https://vkingdecor.com/wp-content/uploads/2024/07/Thiet-ke-studio-ao-cuoi-dep.jpg" alt="Thời trang & Phong cách">
+                <h3>💍 Thời trang & Phong cách</h3>
+            </div>
+            <div class="swiper-slide glassmorphism-card" data-quote="Bình yên không phải ở nơi chốn, mà ở trong tim.">
+                <img src="https://afamilycdn.com/150157425591193600/2022/2/12/can-nha-nho-ben-ngoai-don-gian-ben-trong-am-ap-4-2-1644671619469883579232.jpg" alt="Bình yên & Góc nhỏ">
+                <h3>☕ Bình yên & Góc nhỏ</h3>
+            </div>
+        </div>
+        <div class="swiper-pagination"></div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+    </div>
+</div>
+        <div id="page4" class="card-page gift-page">
+            <h2>Món quà dành cho em</h2>
+            <div id="giftBox" class="gift-box">
+                <div class="base"></div>
+                <div class="lid"></div>
+            </div>
+            <button id="openGiftBtn">Mở quà 🎁</button>
+            <div id="giftMessage" class="hidden">
+                <p class="main-message" style="color:#d44; font-weight: bold; margin-top: 20px;"></p>
+                <div class="virtual-gift">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtESJBdJCwErIf-nAK9Qc34gB7NJstHnFsQg&s" alt="Hộp son" class="rotating-gift">
+                    <p>Hộp son 💄</p>
+                </div>
+                <button id="goToPage5">Tiếp tục ➡️</button>
+            </div>
+        </div>
+
+        <div id="page5" class="card-page letter-page">
+            <h2>Bức thư tình cảm</h2>
+            <div class="letter-paper">
+                <svg width="290" height="150" style="margin-bottom: 10px;">
+                    <path id="letterPath" d="M10 20 C 100 50, 190 50, 280 20 S 200 100, 10 120" fill="none" stroke-width="2"></path>
+                </svg>
+                <p class="final-letter-content"></p>
+                <button id="goToPage6">Tiếp tục ➡️</button>
+            </div>
+        </div>
+
+        <div id="page6" class="card-page share-page">
+            <h2>Chia sẻ Yêu thương</h2>
+            <div class="share-box">
+                <img src="qr_code_placeholder.png" alt="Mã QR" class="qr-code">
+                <p>Link thiệp cá nhân của bạn:</p>
+                <input type="text" id="shareLink" value="https://love-card-for-her.com/id=12345" readonly>
+                <button id="copyLinkBtn" class="share-btn">Copy Link 🔗</button>
+                <button id="shareToSocial" class="share-btn">Gửi đến người đặc biệt 💌</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        /* -------------------------------------------------------------------- */
+        /* JavaScript: Logic và Hoạt ảnh GSAP/Swiper */
+        /* -------------------------------------------------------------------- */
+
+        gsap.registerPlugin(TextPlugin);
+
+        const pages = document.querySelectorAll('.card-page');
+        const musicToggle = document.getElementById('musicToggle');
+        const backgroundMusic = document.getElementById('backgroundMusic');
+        let currentPageIndex = 1; // 1-indexed
+
+        // -------------------- 🎵 Nhạc nền --------------------
+        musicToggle.addEventListener('click', () => {
+            if (backgroundMusic.paused) {
+                backgroundMusic.play();
+                musicToggle.textContent = '🔇 Tắt nhạc';
+            } else {
+                backgroundMusic.pause();
+                musicToggle.textContent = '🎵 Bật nhạc';
+            }
+        });
+
+        // -------------------- Chức năng chuyển trang --------------------
+        function navigateTo(pageIndex) {
+            if (pageIndex < 1 || pageIndex > pages.length) return;
+
+            // Ẩn trang hiện tại
+            gsap.to(pages[currentPageIndex - 1], {
+                opacity: 0,
+                pointerEvents: 'none',
+                duration: 0.5
+            });
+
+            // Hiện trang mới
+            currentPageIndex = pageIndex;
+            gsap.fromTo(pages[currentPageIndex - 1], {
+                opacity: 0,
+                y: 50 // Hiệu ứng trượt nhẹ vào
+            }, {
+                opacity: 1,
+                y: 0,
+                pointerEvents: 'auto',
+                duration: 0.8,
+                onComplete: () => {
+                    // Gọi hàm khởi tạo đặc biệt cho Trang 3 và Trang 5 khi chuyển đến
+                    if (currentPageIndex === 3 && !window.swiperInitialized) {
+                        initSwiper();
+                        window.swiperInitialized = true;
+                    }
+                    if (currentPageIndex === 5) {
+                        startLetterAnimation();
+                    }
+                }
+            });
+        }
+        
+        // -------------------- 🩷 Trang 1: Mở thiệp 3D (ĐÃ SỬA LỖI HIỂN THỊ TRANG 2) --------------------
+        document.getElementById('page1').addEventListener('click', () => {
+            const coverFront = document.querySelector('.cover-front');
+            const container = document.getElementById('loveCardContainer');
+            
+            // Đặt lại style để GSAP kiểm soát 3D và chuyển trang
+            gsap.set(container, { perspective: 1500 });
+            
+            gsap.timeline({
+                // Quan trọng: Chỉ chuyển trang 2 sau khi bìa đã lật xong
+                onComplete: () => navigateTo(2) 
+            })
+            .to(coverFront, {
+                duration: 1.2,
+                rotationY: -180, // Lật mặt trước
+                transformOrigin: 'left center', // Lật từ trái
+                ease: "power2.inOut",
+                // Quan trọng: Sau khi lật, ẩn hẳn trang 1 (bìa)
+                onComplete: () => {
+                    document.getElementById('page1').style.display = 'none';
+                }
+            });
+            // Loại bỏ .to(container, { opacity: 0, ... }) để tránh làm ẩn toàn bộ thiệp
+        });
+
+        // -------------------- 💐 Trang 2: Lời chúc cá nhân hoá --------------------
+        document.getElementById('showGreetingBtn').addEventListener('click', () => {
+            const nameInput = document.getElementById('recipientName');
+            const name = nameInput.value.trim() || "Người phụ nữ tuyệt vời";
+            const greetingDisplay = document.getElementById('greetingDisplay');
+            const greetingTextElement = document.querySelector('#greetingDisplay .greeting-text');
+            const goToPage3Btn = document.getElementById('goToPage3');
+            
+            const fullMessage = `Gửi tặng ${name} – người phụ nữ tuyệt vời nhất hôm nay 🌸`;
+
+            // Ẩn input và nút Gửi, hiện khung lời chúc
+            document.getElementById('showGreetingBtn').classList.add('hidden');
+            nameInput.classList.add('hidden');
+            
+            greetingDisplay.classList.remove('hidden');
+            greetingTextElement.textContent = ''; 
+            goToPage3Btn.style.transform = 'scale(0)'; 
+
+            // Hiệu ứng typing (GSAP TextPlugin)
+            gsap.to(greetingTextElement, {
+                duration: 2.5,
+                text: fullMessage,
+                ease: "none",
+                onComplete: () => {
+                     // Hiển thị nút "Tiếp tục" với hiệu ứng nảy
+                     gsap.to(goToPage3Btn, { scale: 1, duration: 0.5, ease: "back.out(1.7)" });
+                }
+            });
+        });
+
+        document.getElementById('goToPage3').addEventListener('click', () => navigateTo(3));
+        
+        // -------------------- 🌷 Trang 3: Bộ sưu tập cảm xúc (Swiper.js) --------------------
+        function initSwiper() {
+            new Swiper('.swiper-container', {
+                effect: 'coverflow', 
+                grabCursor: true,
+                centeredSlides: true,
+                slidesPerView: 'auto',
+                coverflowEffect: {
+                    rotate: 50,
+                    stretch: 0,
+                    depth: 100,
+                    modifier: 1,
+                    slideShadows: true,
+                },
+                pagination: { el: '.swiper-pagination', clickable: true },
+                navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+                on: {
+                    click: function (swiper, event) {
+                        const clickedSlide = event.target.closest('.swiper-slide');
+                        if (clickedSlide) {
+                            const quote = clickedSlide.getAttribute('data-quote');
+                            gsap.to(clickedSlide, { scale: 1.05, duration: 0.2, yoyo: true, repeat: 1 });
+                            alert(`"${quote}"`);
+                        }
+                    },
+                    transitionEnd: function() {
+                        // Tự động chuyển trang 4 sau khi người dùng tương tác xong (ví dụ: đã lướt hết)
+                        if (this.activeIndex >= 2 && !this.movedToPage4) {
+                             this.movedToPage4 = true;
+                             setTimeout(() => navigateTo(4), 2000);
+                        }
+                    }
+                }
+            });
+        }
+        
+        // -------------------- 🎁 Trang 4: Mở quà ảo --------------------
+        document.getElementById('openGiftBtn').addEventListener('click', () => {
+            gsap.to('.lid', {
+                duration: 1.2,
+                rotationX: 90, 
+                y: -100,
+                ease: "back.out(1.7)",
+                onComplete: () => {
+                    document.getElementById('giftMessage').classList.remove('hidden');
+                    document.querySelector('#giftMessage .main-message').textContent = 
+                        "Chúc em luôn rạng rỡ, được yêu thương và hạnh phúc như món quà hôm nay 💖";
+                    
+                    // Hiệu ứng xoay nhẹ cho món quà
+                    gsap.to('.rotating-gift', {
+                        rotationY: 360,
+                        duration: 10,
+                        repeat: -1,
+                        ease: "linear"
+                    });
+                }
+            });
+            document.getElementById('goToPage5').addEventListener('click', () => navigateTo(5));
+        });
+
+        // -------------------- 🌺 Trang 5: Bức thư tình cảm --------------------
+        function startLetterAnimation() {
+            const path = document.getElementById('letterPath');
+            const pathLength = path.getTotalLength();
+            gsap.set(path, { strokeDasharray: pathLength, strokeDashoffset: pathLength });
+            
+            const letterContent = "Cảm ơn em – vì đã khiến thế giới này dịu dàng hơn. Mỗi khoảnh khắc có em đều là kỷ niệm tuyệt vời nhất.";
+            const contentElement = document.querySelector('.final-letter-content');
+            
+            // Timeline cho hiệu ứng viết tay
+            gsap.timeline({
+                onComplete: () => {
+                    // Khi viết xong, hiện nội dung thật 
+                    contentElement.textContent = letterContent;
+                }
+            })
+            .to(path, {
+                strokeDashoffset: 0,
+                duration: 4,
+                ease: "power1.inOut"
+            })
+            .to(path, {
+                opacity: 0, // Ẩn path sau khi vẽ xong
+                duration: 0.5
+            }, "+=0.5");
+        }
+        document.getElementById('goToPage6').addEventListener('click', () => navigateTo(6));
+
+        // -------------------- 💖 Trang 6: Gửi và chia sẻ --------------------
+        document.getElementById('copyLinkBtn').addEventListener('click', async () => {
+            const link = document.getElementById('shareLink').value;
+            try {
+                await navigator.clipboard.writeText(link);
+                alert('Đã sao chép link thành công!');
+            } catch (err) {
+                // Fallback nếu Clipboard API thất bại
+                const tempInput = document.createElement('input');
+                tempInput.value = link;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempInput);
+                alert('Đã sao chép link thành công (Fallback)!');
+            }
+        });
+
+        // Khởi tạo trang đầu tiên khi tải xong
+        window.onload = () => {
+            pages[0].classList.add('active-page');
+        };
+
+    </script>
+</body>
+</html>
